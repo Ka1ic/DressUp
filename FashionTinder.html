@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Swipe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #FFF5F7;
+        }
+
+        .swipe-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            height: 800px;
+            overflow: visible;
+            touch-action: pan-x;
+            overscroll-behavior-y: none;
+          
+        }
+
+        .swipe-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.6s ease-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .swipe-card:active {
+            cursor: grabbing;
+        }
+
+        .swipe-card img {
+            pointer-events: none;
+            user-drag: none;
+            -webkit-user-drag: none;
+            width: 100%;
+            height: 784px;
+            object-fit: cover;
+        }
+
+        .top-card {
+            z-index: 2;
+            transform: none;
+            opacity: 1;
+        }
+
+        .bottom-card {
+            z-index: 1;
+        }
+
+        .swipe-feedback-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .swipe-feedback {
+            position: absolute;
+            font-size: 4rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            color: #FF6B8B;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+        }
+
+        .nope-feedback {
+            color: #6B5B95;
+            top: 20%;
+            right: 20%;
+            transform: rotate(15deg);
+        }
+
+        .like-feedback {
+            top: 20%;
+            left: 20%;
+            transform: rotate(-15deg);
+        }
+
+        /* Custom styles for the navigation */
+        .nav-bar {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .nav-bar a {
+            transition: all 0.3s ease;
+        }
+
+        .nav-bar a:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Special styling for active state */
+        .nav-bar a.active {
+            color: white;
+        }
+
+        /* Animation for the center button */
+        .nav-bar a.center-button {
+            transition: all 0.3s ease;
+        }
+
+        .nav-bar a.center-button:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Touch feedback animation */
+        .nav-bar a:active {
+            transform: scale(0.95);
+        }
+
+    </style>
+</head>
+<body>
+    <h1 class="text-4xl font-bold mb-12 text-center">Swipe. Match. Style.</h1>
+
+    <div class="swipe-container">
+        <div class="swipe-feedback-container">
+            <i class="fas fa-heart swipe-feedback like-feedback"></i>
+            <i class="fas fa-times swipe-feedback nope-feedback"></i>
+        </div>
+
+        <div id="swipe-card-bottom" class="swipe-card bottom-card">
+            <img src="" alt="">
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2"></h3>
+                <p class="text-gray-600"></p>
+            </div>
+        </div>
+
+        <div id="swipe-card-top" class="swipe-card top-card">
+            <img src="" alt="">
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2"></h3>
+                <p class="text-gray-600"></p>
+            </div>
+        </div>
+    </div>
+
+    <a href="Main.html" class="text-4xl font-bold mb-12 absolute top-4 left-4 ">DressUp</a>
+
+    <div class="mt-8 flex justify-center gap-10">
+        <button id="swipe-left" class="bg-white hover:bg-red-200 text-2xl p-4 rounded-full transition shadow-md">❌</button>
+        <button id="swipe-right" class="bg-white hover:bg-green-200 text-2xl p-4 rounded-full transition shadow-md">❤️</button>
+    </div>
+
+    <div class="absolute top-4 right-4 flex items-center gap-4">
+        <!-- Кнопка фильтров -->
+        <button class="text-4xl text-gray-700 hover:text-pink-500 transition">
+          <i class="fas fa-sliders-h"></i> <!-- Иконка фильтра -->
+        </button>
+      
+        <!-- Аватарка -->
+        <a href="/profile">
+          <img src="https://i.pravatar.cc/48" alt="Профиль" class="w-12 h-12 rounded-full object-cover shadow-md hover:ring-2 ring-pink-400 transition">
+        </a>
+      </div>
+      
+      
+      <button id="swipe-save" class="bg-white text-yellow-500 hover:text-pink-500 text-2xl p-4 rounded-full transition shadow-md">
+        <i class="fas fa-bookmark"></i>
+      </button>
+      
+
+        <!-- Bottom Navigation -->
+    <nav class="nav-bar fixed bottom-0 left-0 right-0 py-4 px-6 z-50 bg-gray-800/50 backdrop-blur-md">
+        <div class="flex justify-center items-center max-w-md mx-auto space-x-6">
+            <a href="#" class="w-12 h-12 flex flex-col items-center justify-center text-gray-400 hover:text-white">
+                <i class="fa-brands fa-bitcoin text-xl"></i>
+                <span class="text-xs block mt-1">NFT</span>
+            </a>
+            <a href="#" class="w-12 h-12 flex flex-col items-center justify-center text-gray-400 hover:text-white">
+                <i class="fas fa-tshirt text-xl"></i>
+                <span class="text-xs block mt-1">Challenges</span>
+            </a>
+            <a href="#" class="w-12 h-12 flex flex-col items-center justify-center text-gray-400 hover:text-white">
+                <i class="fas fa-hashtag text-xl"></i>
+                <span class="text-xs block mt-1">Social</span>
+            </a>
+            <a href="Main.html" class="center-button w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-pink-500 text-white shadow-lg">
+                <div class="flex items-center justify-center w-10 h-10">
+                    <i class="fas fa-home text-2xl"></i>
+                </div>
+            </a>
+            <a href="#" class="w-12 h-12 flex flex-col items-center justify-center text-gray-400 hover:text-white">
+                <i class="fas fa-store text-xl"></i>
+                <span class="text-xs block mt-1">Store</span>
+            </a>
+            <a href="#" class="w-12 h-12 flex flex-col items-center justify-center text-gray-400 hover:text-white">
+                <i class="fas fa-sync-alt text-xl"></i>
+                <span class="text-xs block mt-1">Swipe</span>
+            </a>
+            <a href="#" class="w-12 h-12 flex flex-col items-center justify-center text-gray-400 hover:text-white">
+                <i class="fas fa-tshirt text-xl"></i>
+                <span class="text-xs block mt-1">Try-On</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        let isLocked = false;
+        const swipeCards = [
+            {
+                img: 'https://i.ibb.co/8LdpK4Qq/b16f4523ffc2f0b21d3758685b29e457.jpg',
+                title: 'Cozy Fall',
+                desc: 'Perfect for layering and hot coffee'
+            },
+            {
+                img: 'https://i.ibb.co/4RN6PPjL/4a74ef0283a3171eccfd1ffca88d3143.jpg',
+                title: 'Night Sparkle',
+                desc: 'Shiny and elegant for an evening out'
+            },
+            {
+                img: 'https://i.ibb.co/chv1K1j0/79c5b5668da3fb5e3aa020a372708ed4.jpg',
+                title: 'Street Casual',
+                desc: 'Effortless and comfy for every day'
+            }
+        ];
+
+        let currentIndex = 0;
+        let topCard = document.getElementById('swipe-card-top');
+        let bottomCard = document.getElementById('swipe-card-bottom');
+        let isDragging = false;
+        let startX = 0;
+        let currentTranslate = 0;
+
+        function preloadNext() {
+            const nextIndex = (currentIndex + 1) % swipeCards.length;
+            const img = new Image();
+            img.src = swipeCards[nextIndex].img;
+        }
+
+        function updateCard(card, data) {
+            const imgEl = card.querySelector('img');
+            const preloader = new Image();
+            preloader.src = data.img;
+            
+            preloader.onload = () => {
+                imgEl.src = data.img;
+                card.querySelector('h3').textContent = data.title;
+                card.querySelector('p').textContent = data.desc;
+            };
+        }
+
+        function onTransitionEnd() {
+            topCard.removeEventListener('transitionend', onTransitionEnd);
+            currentIndex = (currentIndex + 1) % swipeCards.length;
+            
+            const oldTop = topCard;
+            const newTop = bottomCard;
+
+            oldTop.style.opacity = '0';
+            oldTop.style.transition = 'none';
+            oldTop.style.transform = currentTranslate > 0
+                ? 'translateX(calc(100vw + 200px)) rotate(15deg)'
+                : 'translateX(calc(-100vw - 200px)) rotate(-15deg)';
+
+            oldTop.classList.remove('top-card');
+            oldTop.classList.add('bottom-card');
+            newTop.classList.remove('bottom-card');
+            newTop.classList.add('top-card');
+
+            topCard = newTop;
+            bottomCard = oldTop;
+
+            isLocked = false;
+            attachSwipeListeners(topCard);
+
+            requestAnimationFrame(() => {
+                bottomCard.style.transition = 'none';
+                bottomCard.style.transform = 'none';
+                bottomCard.style.opacity = '1';
+                bottomCard.style.visibility = 'hidden';
+
+                requestAnimationFrame(() => {
+                    updateCard(bottomCard, swipeCards[(currentIndex + 1) % swipeCards.length]);
+                    bottomCard.style.visibility = 'visible';
+                    preloadNext();
+                });
+            });
+
+            document.querySelectorAll('.swipe-feedback').forEach(f => f.style.opacity = 0);
+        
+            isSaved = false;
+            saveIcon.classList.remove('fa-check');
+            saveIcon.classList.add('fa-bookmark');
+        }
+
+        function startDrag(x) {
+            if (isLocked) return;
+            isDragging = true;
+            startX = x;
+            topCard.style.transition = 'none';
+        }
+
+        function moveDrag(x) {
+            if (!isDragging) return;
+            currentTranslate = x - startX;
+            const rotate = currentTranslate * 0.1;
+            topCard.style.transform = `translateX(${currentTranslate}px) rotate(${rotate}deg)`;
+
+            const likeIcon = document.querySelector('.like-feedback');
+            const nopeIcon = document.querySelector('.nope-feedback');
+
+            if (currentTranslate > 0) {
+                likeIcon.style.opacity = Math.min(currentTranslate / 100, 1);
+                nopeIcon.style.opacity = 0;
+            } else {
+                nopeIcon.style.opacity = Math.min(-currentTranslate / 100, 1);
+                likeIcon.style.opacity = 0;
+            }
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            topCard.style.transition = 'all 0.6s ease-out';
+
+            const threshold = 100;
+            if (Math.abs(currentTranslate) > threshold) {
+                isLocked = true;
+                topCard.style.transform = currentTranslate > 0
+                    ? 'translateX(calc(100vw + 200px)) rotate(15deg)'
+                    : 'translateX(calc(-100vw - 200px)) rotate(-15deg)';
+                topCard.addEventListener('transitionend', onTransitionEnd);
+            } else {
+                topCard.style.transform = 'none';
+                document.querySelectorAll('.swipe-feedback').forEach(f => f.style.opacity = 0);
+            }
+
+            currentTranslate = 0;
+        }
+
+        function attachSwipeListeners(card) {
+            card.addEventListener('mousedown', e => startDrag(e.clientX));
+            card.addEventListener('touchstart', e => {
+                e.preventDefault();
+                startDrag(e.touches[0].clientX);
+            });
+        }
+
+        function loadCards() {
+            updateCard(bottomCard, swipeCards[(currentIndex + 1) % swipeCards.length]);
+            updateCard(topCard, swipeCards[currentIndex]);
+
+            topCard.style.transition = 'none';
+            topCard.style.transform = 'none';
+            void topCard.offsetWidth;
+            topCard.style.transition = '';
+
+            preloadNext();
+        }
+
+        // Initialize
+        loadCards();
+        attachSwipeListeners(topCard);
+
+        // Global event listeners
+        document.addEventListener('mousemove', e => moveDrag(e.clientX));
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchmove', e => moveDrag(e.touches[0].clientX));
+        document.addEventListener('touchend', endDrag);
+
+        // Button handlers
+        document.getElementById('swipe-right').addEventListener('click', () => {
+            if (isLocked) return;
+            isLocked = true;
+
+            const like = document.querySelector('.like-feedback');
+            like.style.opacity = 1;
+
+            currentTranslate = 1000;
+            topCard.style.transition = 'transform 0.6s ease-out';
+            topCard.style.transform = 'translateX(calc(100vw + 200px)) rotate(15deg)';
+
+            topCard.addEventListener('transitionend', onTransitionEnd);
+        });
+
+        document.getElementById('swipe-left').addEventListener('click', () => {
+            if (isLocked) return;
+            isLocked = true;
+
+            const nope = document.querySelector('.nope-feedback');
+            nope.style.opacity = 1;
+
+            currentTranslate = -1000;
+            topCard.style.transition = 'transform 0.6s ease-out';
+            topCard.style.transform = 'translateX(calc(-100vw - 200px)) rotate(-15deg)';
+
+            topCard.addEventListener('transitionend', onTransitionEnd);
+        });
+    </script>
+    
+    <script>
+        const saveBtn = document.getElementById('swipe-save');
+        const saveIcon = saveBtn.querySelector('i');
+        let isSaved = false;
+
+        saveBtn.addEventListener('click', () => {
+            isSaved = !isSaved;
+
+            if (isSaved) {
+            saveIcon.classList.remove('fa-bookmark');
+            saveIcon.classList.add('fa-check');
+        } else {
+            saveIcon.classList.remove('fa-check');
+            saveIcon.classList.add('fa-bookmark');
+        }
+        });
+
+      </script>
+
+<script>
+    // Navigation functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.nav-bar a');
+        
+        // Add click handlers to all navigation items
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default link behavior
+                
+                // Remove active class from all links
+                navLinks.forEach(l => l.classList.remove('active'));
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Add touch feedback
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 300);
+            });
+        });
+
+        // Hide navigation on scroll down, show on scroll up
+        let lastScroll = 0;
+        const nav = document.querySelector('.nav-bar');
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll <= 0) {
+                nav.style.transform = 'translateY(0)';
+                return;
+            }
+            
+            if (currentScroll > lastScroll && !nav.contains(document.activeElement)) {
+                // Scrolling down & no element in nav is focused
+                nav.style.transform = 'translateY(100%)';
+            } else {
+                // Scrolling up
+                nav.style.transform = 'translateY(0)';
+            }
+            
+            lastScroll = currentScroll;
+        });
+    });
+</script>
+      
+
+</body>
+</html>
